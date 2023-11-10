@@ -3,27 +3,163 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <title>Title</title>
+        <title>Jeux vidéo, websocket et binaire : du temps réel efficace dans le navigateur</title>
     </head>
     <body>
         <div class="reveal">
             <div class="slides">
                 <section>
-                    <h2>Title</h2>
+                    <h3>Jeux vidéo, websocket & binaire<br/><small>du temps réel efficace dans le navigateur</small></h3>
                 </section>
                 <section>
                     <section>
-                        <h3>Foo</h3>
-                    </section>
-                    <section data-background-image="img/tom32i.jpg">
-                        <h3>Bar</h3>
+                        <h4>Qu'est-ce que les Websocket ?</h4>
+                        <!-- Connexion bidirectionnelle persistante entre un serveur web et un navigateur sur un socket TCP -->
                     </section>
                     <section>
-                        <h3>Baz</h3>
-                        <img class="r-stretch" src="https://via.placeholder.com/150" />
-                        <p class="caption">
-                            <a href="https://via.placeholder.com/150">via.placeholder.com/150</a>
-                        </p>
+                        <img class="" src="img/handshake.png" />
+                    </section>
+                    <section>
+                        <h4>Communication texte</h4>
+                        <!-- JSON -->
+                        <img src="img/json.png" />
+                    </section>
+                    <section>
+                        <h4>C'est cool ! Ça va vite !</h4>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h4>Comment ça marche sous le capot ?</h4>
+                        <!-- JSON est en binaire en vrai, mais pas optimisé -->
+                    </section>
+                    <section>
+                        <pre><code class="hljs json" id="json1">{ "name": "client", "id": 42 }</code></pre>
+                        <p class="caption">30 charactères</p>
+                        <pre class="fragment"><code class="hljs txt code-inline">[123 32 34 110 97 109 101 34 58 32 34 99 108 105 101 110 116 34 44 32 34 105 100 34 58 32 52 50 32 125]</code></pre>
+                        <div class="fragment">
+                            <pre><code class="hljs txt code-inline">01111011 00100000 00100010 01101110 01100001 01101101 01100101 00100010 00111010 00100000 00100010 01100011 01101100 01101001 01100101 01101110 01110100 00100010 00101100 00100000 00100010 01101001 01100100 00100010 00111010 00100000 00110100 00110010 00100000 01111101</code></pre>
+                            <p class="caption">30 octets</p>
+                        </div>
+                    </section>
+                    <section>
+                        <h4>Parlons directement binaire ! 🤖</h4>
+                    </section>
+                    <section>
+                        <h5>Representation numérique</h5>
+                        <!-- Toute information doit être representé numériquement -->
+                    </section>
+                    <section>
+                        <pre class=""><code class="hljs json">{ "name": "client", "id": 42 }</code></pre>
+                        <pre class=""><code class="">messageId, value</code></pre>
+                        <pre class=""><code class="">client, 42</code></pre>
+                    </section>
+                    <section>
+                        <img class="r-stretch" src="img/morse.jpeg">
+                    </section>
+                    <section>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Message</th>
+                                    <th>Id</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>client:new</td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <td>client:left</td>
+                                    <td>2</td>
+                                </tr>
+                                <tr>
+                                    <td>client:name</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>game:new</td>
+                                    <td>4</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+                    <section>
+                        <pre><code>[client, 42]</code></pre>
+                        <pre><code>[1, 42]</code></pre>
+                        <pre><code>00000001 00101010</code></pre>
+                        <p class="caption">2 octets</p>
+                    </section>
+                    <section>
+                        <h4>Plus complexe ...</h4>
+                        <pre><code class="hljs json">{
+    "name": "player:position",
+    "id":   42,
+    "x":    3466,
+    "y":    6046
+}</code></pre>
+                    </section>
+                    <section>
+                        <pre><code>[player:position, 42, 3466, 6046]</code></pre>
+                        <pre><code>[5, 42, 3466, 6046]</code></pre>
+                        <div class="fragment">
+                            <pre><code>00000101 00101010 110110001010 1011110011110</code></pre>
+                            <p class="caption">6 octets</p>
+                        </div>
+                    </section>
+                    <section>
+                        <h4>Avec du texte</h4>
+                        <pre><code class="hljs json">{
+    "name":  "player:name",
+    "id":    42,
+    "value": "Tom32i",
+}</code></pre>
+                    </section>
+                    <section>
+                        <pre><code>[id, clientId, length, T, o, m, 3, 2, i]</code></pre>
+                        <pre><code>[6, 42, 6, 84, 111, 109, 51, 50, 105]</code></pre>
+                        <div class="fragment">
+                            <pre><code>00000110 00101010 00000110 01010100 01101111 01101101 00110011 00110010 01101001</code></pre>
+                            <p class="caption">9 octets</p>
+                        </div>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h4>La reception</h4>
+                    </section>
+                    <section>
+                        <h4>Decodage du premier octet</h4>
+                        <!-- Pour savoir à quel message j'ai affaire -->
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h4>En Javascript</h4>
+                        <a href="https://github.com/Tom32i/netcode">
+                            github.com/Tom32i/netcode
+                        </a>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h4>En Go ?</h4>
+                    </section>
+                    <section>
+                        <h4>Gorilla Websocket</h4>
+                    </section>
+                    <section>
+                        <h4>Tableau d'octet en I/O</h4>
+                    </section>
+                    <section>
+                        <h4>Encoder/Decoder</h4>
+                    </section>
+                    <section>
+                        <h4>Listes des messages indexés</h4>
+                    </section>
+                    <section>
+                        <h4></h4>
                     </section>
                 </section>
                 <section>

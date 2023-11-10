@@ -8,9 +8,9 @@ install:
 	npm install
 
 ## Build
-build:
+build: install
 	npm run build
 
 ## Start watcher and server
-start:
+start: install
 	npm run start

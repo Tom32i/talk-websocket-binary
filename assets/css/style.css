@@ -1,0 +1,5 @@
+.code-inline {
+    max-width: 90%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
