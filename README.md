@@ -1,6 +1,9 @@
-# Jeux vidéo, websocket et binaire : du temps réel efficace dans le navigateur
+# Jeux vidéo, websocket et binaire : du temps réel performant dans le navigateur
 
-Comment designer son propre système binaire pour communiquer efficacement en temps réel via les Websocket.
+> Connaissez vous les websocket ? La techno idéale pour coder des expériences temps réel dans le navigateur et que j'utilise dans tout mes projets collaboratifs et jeux multijoueur.
+> Je vous propose de nous intéresser à son fonctionnement et à la façon dont on peut mettre en place cette communication client/serveur performante en échangeant directement en binaire.
+> On s'amusera à les voir prendre vie tous ensemble dans une demo live ... en GO !
+
 
 Slides: https://tom32i.github.io/netcode-binary
 
