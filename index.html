@@ -12,7 +12,7 @@
           <h3>Jeux vidéo, websocket & binaire<br/><small>du temps réel efficace dans le navigateur</small></h3>
         </section>
         <section>
-          <section data-background-size="contain" data-background-image="img/sockette.webp">
+          <section data-background-size="contain">
             <h4>Qu'est-ce que les Websocket ?</h4>
             <!-- <img class="r-stretch" src="img/sockette.webp"> -->
           </section>
@@ -31,6 +31,7 @@
             <img class="r-stretch" src="img/handshake.svg">
           </section>
           <section>
+            <h4>Handshake 🤝</h4>
             <img class="" src="img/handshake.png" />
           </section>
           <section>
@@ -50,11 +51,10 @@
           </section>
           <section>
             <pre><code class="hljs json" id="json1">{ "name": "client", "id": 42 }</code></pre>
-            <p class="caption">30 charactères</p>
             <pre class="fragment"><code class="hljs txt code-inline">[123 32 34 110 97 109 101 34 58 32 34 99 108 105 101 110 116 34 44 32 34 105 100 34 58 32 52 50 32 125]</code></pre>
             <div class="fragment">
               <pre><code class="hljs txt code-inline">01111011 00100000 00100010 01101110 01100001 01101101 01100101 00100010 00111010 00100000 00100010 01100011 01101100 01101001 01100101 01101110 01110100 00100010 00101100 00100000 00100010 01101001 01100100 00100010 00111010 00100000 00110100 00110010 00100000 01111101</code></pre>
-              <p class="caption">30 octets</p>
+              <p class="caption fragment">30 charactères / 30 octets</p>
             </div>
           </section>
           <section>
@@ -65,8 +65,10 @@
             <!-- Toute information doit être representé numériquement -->
           </section>
           <section>
+            <h5>Mon information</h5>
             <pre class=""><code class="hljs json">{ "name": "client", "id": 42 }</code></pre>
             <pre class="fragment"><code class="">[client, 42]</code></pre>
+            <pre class="fragment"><code class="">[message, clientId]</code></pre>
           </section>
           <section>
             <img class="r-stretch" src="img/morse.jpeg">
@@ -103,7 +105,7 @@
             </table>
           </section>
           <section>
-            <pre><code>[client, 42]</code></pre>
+            <pre><code>[client:new, clientId]</code></pre>
             <pre><code>[1, 42]</code></pre>
             <pre><code>00000001 00101010</code></pre>
             <p class="caption">2 octets</p>
@@ -118,7 +120,7 @@
 }</code></pre>
           </section>
           <section>
-            <pre><code>[player:position, 42, 3466, 6046]</code></pre>
+            <pre><code>[player:position, clientId, X, Y]</code></pre>
             <pre><code>[5, 42, 3466, 6046]</code></pre>
             <div class="fragment">
               <pre><code>00000101 00101010 110110001010 1011110011110</code></pre>
@@ -165,59 +167,13 @@
         </section>
         <section>
           <section>
-            <h4>Codons un Miro !</h4>
-          </section>
-          <section>
-            <img class="r-stretch" src="img/encoder.svg">
-          </section>
-          <section>
-            <h4>Coté navigateur, en javascript :</h4>
-            <a href="https://github.com/Tom32i/netcode">
-              github.com/Tom32i/netcode
-            </a>
-          </section>
-          <section>
-          <pre><code class="hljs javascript">new BinaryEncoder([
-  ['me:id', new Int8Codec()],
-  ['me:name', new StringCodec()],
-  ['me:position', new PositionCodec()],
-  ['client:add', new ClientAddCodec()],
-  ['client:remove', new Int8Codec()],
-  ['client:name', new ClientNameCodec()],
-  ['client:position', new PositionCodec()],
-])</code></pre>
-          </section>
-        </section>
-        <section>
-          <section>
-            <h4>Coté serveur, <strong>codons en Go !</strong></h4>
-          </section>
-          <section>
-            <h4>Gorilla Websocket</h4>
-            <pre><code class="hljs go">func (s *Server) Handler(w http.ResponseWriter, r *http.Request) {
-  socket, err := server.upgrader.Upgrade(w, r, nil)
-  client := s.createClient(socket)
-  go client.run(s)
-}
-
-http.HandleFunc("/ws", server.Handler)</code></pre>
-          </section>
-          <section>
-            <h4>Goroutine client</h4>
-            <pre><code class="hljs go">func (c *Client) run(server *Server) {
-  for {
-    // func (c *Conn) ReadMessage() (type int, p []byte, err error)
-    _, data, err := c.socket.ReadMessage()
-    if err != nil {
-      // Close socket
-    }
-
-    server.in &lt;- ClientMessage{c, c.encoder.Decode(data)}
-  }
-}</code></pre>
+            <h3>Codons un Miro ! 🎉</h3>
           </section>
           <section>
             <h4>Encoder/Decoder</h4>
+            <img class="r-stretch" src="img/codec.svg">
+          </section>
+          <section>
             <pre><code class="hljs go">type Codec interface {
   encode(buffer *bytes.Buffer, data any)
   decode(buffer *bytes.Buffer) any
@@ -227,8 +183,8 @@ http.HandleFunc("/ws", server.Handler)</code></pre>
             <h4>Codec de base</h4>
             <pre><code class="hljs go">type Int8Codec struct {}
 
-func (c *Int8Codec) encode(buffer *bytes.Buffer, data any) {
-    buffer.Write([]byte{data.(uint8)})
+func (c *Int8Codec) encode(buffer *bytes.Buffer, message any) {
+    buffer.Write([]byte{message.(uint8)})
 }
 
 func (c *Int8Codec) decode(buffer *bytes.Buffer) any {
@@ -238,9 +194,9 @@ func (c *Int8Codec) decode(buffer *bytes.Buffer) any {
           <section>
             <pre><code class="hljs go">type Int16Codec struct {}
 
-func (c *Int16Codec) encode(buffer *bytes.Buffer, data any) {
+func (c *Int16Codec) encode(buffer *bytes.Buffer, message any) {
     b := make([]byte, 2)
-    binary.BigEndian.PutUint16(b[0:], data.(uint16))
+    binary.BigEndian.PutUint16(b[0:], message.(uint16))
     buffer.Write(b)
 }
 
@@ -250,33 +206,35 @@ func (c *Int16Codec) decode(buffer *bytes.Buffer) any {
           </section>
           <section>
             <h4>Codec composite</h4>
-            <pre><code class="hljs go">type ClientPosition struct {
+            <pre><code class="hljs go">type PositionCodec struct {
+  int8Codec *Int8Codec
+  int16Codec *Int16Codec
+}
+
+type ClientPosition struct {
   Id uint8
   X uint16
   Y uint16
-}
-
-type PositionCodec struct {
-  idCodec *Int8Codec
-  positionCodec *Int16Codec
 }</code></pre>
           </section>
           <section>
-            <h4>Codec composite</h4>
             <pre><code class="hljs go">func (c *PositionCodec) encode(buffer *bytes.Buffer, data any) {
     message := data.(ClientPosition)
-    c.idCodec.encode(buffer, message.Id)
-    c.positionCodec.encode(buffer, message.X)
-    c.positionCodec.encode(buffer, message.Y)
+    c.int8Codec.encode(buffer, message.Id)
+    c.int16Codec.encode(buffer, message.X)
+    c.int16Codec.encode(buffer, message.Y)
 }
 
 func (c *PositionCodec) decode(buffer *bytes.Buffer) any {
     return ClientPosition{
-        Id: c.idCodec.decode(buffer).(uint8),
-        X: c.positionCodec.decode(buffer).(uint16),
-        Y: c.positionCodec.decode(buffer).(uint16),
+        Id: c.int8Codec.decode(buffer).(uint8),
+        X: c.int16Codec.decode(buffer).(uint16),
+        Y: c.int16Codec.decode(buffer).(uint16),
     }
 }</code></pre>
+          </section>
+          <section>
+            <img class="r-stretch" src="img/encoder.svg">
           </section>
           <section>
             <pre><code class="hljs go">type BinaryEncoder struct {
@@ -291,34 +249,100 @@ type RegisteredCodec struct {
 }</code></pre>
           </section>
           <section>
-            <h4>Listes des messages indexés</h4>
+            <pre><code class="hljs go">func (e BinaryEncoder) Encode(message Message) []byte {
+  var buffer bytes.Buffer
+
+  codec := e.codecsByName[message.Name]
+
+  e.idCodec.encode(&buffer, codec.Id)
+  codec.Handler.encode(&buffer, message.Data)
+
+  return buffer.Bytes()
+}</code></pre>
+          </section>
+          <section>
+            <pre><code class="hljs go">func (e BinaryEncoder) Decode(data []byte) Message {
+  var buffer = bytes.NewBuffer(data)
+
+  id := e.idCodec.decode(buffer)
+  codec := e.codecsById[id]
+
+  return Message{
+    Name: codec.Name,
+    Data: codec.Handler.decode(buffer),
+  }
+}</code></pre>
+          </section>
+          <section>
+            <h4>Listes des messages</h4>
             <pre><code class="hljs go">codec.CreateBinaryEncoder([]codec.RegisteredCodec{
-  {0, "me:id", &codec.Int8Codec{}},
-  {1, "me:name", &codec.StringCodec{}},
+  {0, "me:id", codec.Int8Codec{}},
+  {1, "me:name", codec.StringCodec{}},
   {2, "me:position", codec.CreatePositionCodec()},
   {3, "client:add", codec.CreateClientAddCodec()},
-  {4, "client:remove", &codec.Int8Codec{}},
+  {4, "client:remove", codec.Int8Codec{}},
   {5, "client:name", codec.CreateClientNameCodec()},
   {6, "client:position", codec.CreatePositionCodec()},
 })</code></pre>
           </section>
-          <!-- <section data-background-iframe="https://go.tom32i.fr" data-background-interactive=false> -->
-          <section data-background-iframe="http://localhost:8034" data-background-interactive=false>
+          <section>
+            <h4>Gorilla Websocket</h4>
+            <pre><code class="hljs go">func (s *Server) Handler(w http.ResponseWriter, r *http.Request) {
+  socket, err := server.upgrader.Upgrade(w, r, nil)
+  client := s.createClient(socket)
+  go client.run(s)
+}
+
+http.HandleFunc("/ws", server.Handler)</code></pre>
+          </section>
+          <section>
+            <h4>Ecriture</h4>
+            <pre><code class="hljs go">func (c *Client) write(data []byte) {
+  c.socket.WriteMessage(websocket.BinaryMessage, data)
+}</code></pre>
+          </section>
+          <section>
+            <h4>Reception</h4>
+            <pre><code class="hljs go">func (c *Client) run(server *Server) {
+  for {
+     // (type int, p []byte, err error)
+    _, data, err := c.socket.ReadMessage()
+    if err != nil {  /* Close socket */ }
+
+    server.in &lt;- ClientMessage{c, c.encoder.Decode(data)}
+  }
+}</code></pre>
+          </section>
+          <section>
+            <h4>Coté navigateur, en javascript :</h4>
+            <a href="https://github.com/Tom32i/netcode">
+              github.com/Tom32i/netcode
+            </a>
+          </section>
+          <section>
+          <pre><code class="hljs javascript">new BinaryEncoder([
+  /*0*/['me:id', new Int8Codec()],
+  /*1*/['me:name', new StringCodec()],
+  /*2*/['me:position', new PositionCodec()],
+  /*3*/['client:add', new ClientAddCodec()],
+  /*4*/['client:remove', new Int8Codec()],
+  /*5*/['client:name', new ClientNameCodec()],
+  /*6*/['client:position', new PositionCodec()],
+])</code></pre>
+          </section>
+          <section>
+            <h3>Demo time !</h3>
+          </section>
+          <section data-background-iframe="https://go.tom32i.fr?name=Tom32i" data-background-interactive=false>
+            <h5 class="fragment fade-out">go.tom32i.fr</h5>
           </section>
         </section>
         <section>
           <div class="end">
-            <div class="row">
-              <div class="sources">
-                <h3>Ressources</h3>
-                <p>🐙 <a target="_blank" href="https://github.com/Tom32i/tak-skeleton">Tom32i/tak-skeleton</a></p>
-              </div>
-              <div>
-                <a target="_blank" href="https://thomas.jarrand.fr">
-                  <img class="avatar" src="img/tom32i.jpg">
-                  <p>@Tom32i</p>
-                </a>
-              </div>
+            <div class="sources">
+              <h3>Ressources</h3>
+              <p>🐙 <a target="_blank" href="https://github.com/Tom32i/go-websocket">Tom32i/go-websocket</a></p>
+              <p>🐙 <a target="_blank" href="https://github.com/Tom32i/netcode-binary">Tom32i/netcode-binary</a></p>
             </div>
             <h1 class="fragment thanks">Merci !🙏</h1>
           </div>
