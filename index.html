@@ -9,11 +9,20 @@
     <div class="reveal">
       <div class="slides">
         <section>
-          <h3>Jeux vidéo, websocket & binaire<br/><small>du temps réel efficace dans le navigateur</small></h3>
+          <!-- <section> -->
+            <h3>Jeux vidéo, websocket & binaire<br/><small>du temps réel efficace dans le navigateur</small></h3>
+          <!-- </section> -->
+          <!-- <section>
+            <img class="avatar" src="img/tom32i.jpg">
+            <p>
+              <q>Je code des deux cotés de la requête HTTP.</q>
+              <strong>Thomas Jarrand</strong>
+            </p>
+          </section> -->
         </section>
         <section>
-          <section data-background-size="contain">
-            <h4>Qu'est-ce que les Websocket ? 🧦</h4>
+          <section>
+            <h3>Qu'est-ce que les Websocket ? 🧦</h3>
             <!-- <img class="r-stretch" src="img/sockette.webp"> -->
           </section>
           <section>
@@ -35,22 +44,22 @@
             <img class="" src="img/handshake.png" />
           </section>
           <section>
-            <h4>Communication texte (JSON)</h4>
+            <h4>Communication texte 📝</h4>
             <!-- JSON -->
             <img src="img/json.png" />
           </section>
           <section>
-            <h4>C'est cool ! Ça va vite ! ⚡️</h4>
-            <h4 class="fragment">Mais peut-on faire mieux ?</h4>
+            <h4 class="fragment strike">C'est cool ! Ça va vite !</h4>
+            <h4 class="fragment">Peut-on faire mieux ?</h4>
           </section>
         </section>
         <section>
           <section>
-            <h4>Que se passe-t-il quand on communique en JSON ?</h4>
+            <h3>Parlons optimisation ⚡️</h3>
             <!-- JSON est en binaire en vrai, mais pas optimisé -->
           </section>
           <section>
-            <h5>Message JSON</h5>
+            <h4>Message JSON</h4>
             <pre><code class="hljs txt" id="json1">{ "name": "client:new", "id": 42 }</code></pre>
             <pre class="fragment"><code class="hljs txt code-inline">[123 32 34 110 97 109 101 34 58 32 34 99 108 105 101 110 116 34 44 32 34 105 100 34 58 32 52 50 32 125]</code></pre>
             <div class="fragment">
@@ -62,11 +71,11 @@
             <h4>Parlons directement binaire ! 🤖</h4>
           </section>
           <section data-background-image="img/matrix.jpg">
-            <h5>Representation numérique</h5>
+            <h4>Représentation numérique</h4>
             <!-- Toute information doit être representé numériquement -->
           </section>
           <section>
-            <h5>Mon information</h5>
+            <h4>Mon information</h4>
             <pre class=""><code class="hljs json">{ "name": "client:new", "id": 42 }</code></pre>
             <pre class="fragment"><div class="code hljs txt">[<span class="hljs-string">client:new</span>, <span class="hljs-number">42</span>]</div></pre>
             <pre class="fragment"><div class="code hljs txt">[<span class="hljs-string">messageName</span>, <span class="hljs-number">clientId</span>]</div></pre>
@@ -75,7 +84,7 @@
             <img class="r-stretch" src="img/morse.jpeg">
           </section>
           <section>
-            <h3>Messages</h3>
+            <h4>Indexer les messages</h4>
             <table>
               <thead>
                 <tr>
@@ -130,18 +139,18 @@
             </div>
           </section>
           <section>
-            <h4>La réception</h4>
+            <h3>La réception 📡</h3>
             <pre class="fragment"><code class="txt">00000111 00101010 00000001</code></pre>
           </section>
           <section>
-            <h4>Decodage du premier octet</h4>
+            <h4>Décodage du premier octet</h4>
             <pre><code class="txt">00000111</code></pre>
             <!-- Pour savoir à quel message j'ai affaire -->
             <pre class="fragment"><code class="txt">7</code></pre>
             <pre class="fragment"><code class="txt">player:kill</code></pre>
           </section>
           <section>
-            <h4>Decodage du reste du message</h4>
+            <h4>Décodage du reste du message</h4>
             <!-- Pour savoir à quel message j'ai affaire -->
             <pre><div class="code hljs txt">[<span class="hljs-string">player:kill</span>, <span class="hljs-number">killerID</span>, <span class="color-x">killedID</span>]</div></pre>
             <pre class="fragment"><div class="code hljs txt"><span class="hljs-string">00000111</span> <span class="hljs-number">00101010</span> <span class="color-x">00000001</span></div></pre>
@@ -155,19 +164,21 @@
             <img class="gopher fragment fade-up plain" src="img/gopher.svg" />
           </section>
           <section>
-            <h4>Encoder/Decoder</h4>
+            <h4>Encodeur / Décodeur</h4>
             <img class="r-stretch plain" src="img/codec.svg">
           </section>
           <section>
+            <h4>L'interface Codec</h4>
             <pre><code class="hljs go">type Codec interface {
   encode(buffer *bytes.Buffer, data any)
   decode(buffer *bytes.Buffer) any
 }</code></pre>
           </section>
           <section>
-            <h4>Codec de base</h4>
+            <h4>Codec élémentaire : entier sur 1 octet</h4>
             <pre><code class="hljs go">type Int8Codec struct {}
 
+// Encode un entier de 0 à 255
 func (c *Int8Codec) encode(buf *bytes.Buffer, data any) {
     buf.Write([]byte{data.(uint8)})
 }
@@ -177,8 +188,10 @@ func (c *Int8Codec) decode(buf *bytes.Buffer) any {
 }</code></pre>
           </section>
           <section>
+            <h4>Codec élémentaire : entier sur 2 octets</h4>
             <pre><code class="hljs go">type Int16Codec struct {}
 
+// Encode un entier de 0 à 65535
 func (c *Int16Codec) encode(buf *bytes.Buffer, data any) {
     b := make([]byte, 2)
     binary.BigEndian.PutUint16(b[0:], data.(uint16))
@@ -196,25 +209,29 @@ func (c *Int16Codec) decode(buf *bytes.Buffer) any {
   int16Codec *Int16Codec
 }
 
+// Position du client
 type ClientPosition struct {
   Id uint8
   X uint16
   Y uint16
-}</code></pre>
+}
+</code></pre>
           </section>
           <section>
-            <pre><code class="hljs go">func (c *PositionCodec) encode(buffer *bytes.Buffer, data any) {
-    message := data.(ClientPosition)
-    c.int8Codec.encode(buffer, message.Id)
-    c.int16Codec.encode(buffer, message.X)
-    c.int16Codec.encode(buffer, message.Y)
+            <pre><code class="hljs go">// Encode une ClientPosition dans le buffer
+func (c *PositionCodec) encode(buf *bytes.Buffer, data any) {
+    cp := data.(ClientPosition)
+    c.int8Codec.encode(buf, cp.Id) // + Id sur 1 octet
+    c.int16Codec.encode(buf, cp.X) // + X sur 2 octet
+    c.int16Codec.encode(buf, cp.Y) // + Y sur 2 octet
 }
 
-func (c *PositionCodec) decode(buffer *bytes.Buffer) any {
+// Décode une ClientPosition à partir des valeurs du buffer
+func (c *PositionCodec) decode(buf *bytes.Buffer) any {
     return ClientPosition{
-        Id: c.int8Codec.decode(buffer).(uint8),
-        X: c.int16Codec.decode(buffer).(uint16),
-        Y: c.int16Codec.decode(buffer).(uint16),
+        Id: c.int8Codec.decode(buf).(uint8), // octet 1
+        X: c.int16Codec.decode(buf).(uint16), // octet 2 et 3
+        Y: c.int16Codec.decode(buf).(uint16), // octet 3 et 4
     }
 }</code></pre>
           </section>
@@ -223,43 +240,53 @@ func (c *PositionCodec) decode(buffer *bytes.Buffer) any {
           </section>
           <section>
             <pre><code class="hljs go">type BinaryEncoder struct {
-  idCodec Int8Codec
-  codecs  map[uint8]RegisteredCodec
+  idCodec      Int8Codec // Id des messages
+  codecsByName map[string]*RegisteredCodec // Encodage
+  codecsById   map[uint8]*RegisteredCodec // Décodage
 }
 
 type RegisteredCodec struct {
-  Id      uint8
-  Name    string
-  Handler Codec
+  Id      uint8  // 5
+  Name    string // "client:position"
+  Handler Codec  // PositionCodec
 }</code></pre>
           </section>
           <section>
             <pre><code class="hljs go">func (e BinaryEncoder) Encode(message Message) []byte {
-  var buffer bytes.Buffer
+  var buffer bytes.Buffer // 1. Nouveau Buffer vide
 
+  // 2. Récupère le bon codec pour mon message
   codec := e.codecsByName[message.Name]
 
+  // 3. Encode l'ID sur le premier octet
   e.idCodec.encode(&buffer, codec.Id)
+
+  // 4. Encode le reste des données via le codec adapté
   codec.Handler.encode(&buffer, message.Data)
 
-  return buffer.Bytes()
+  return buffer.Bytes() // 5. Retourne les octets
 }</code></pre>
           </section>
           <section>
             <pre><code class="hljs go">func (e BinaryEncoder) Decode(data []byte) Message {
+  // 1. Buffer contenant les octets reçus :
   var buffer = bytes.NewBuffer(data)
 
+  // 2. Décodage de l'ID dans le premier octet :
   id := e.idCodec.decode(buffer)
+  // 3. Récupère le bon codec pour ce message :
   codec := e.codecsById[id]
 
+  // 5. Retour un Message complet 🎉 :
   return Message{
     Name: codec.Name,
+    // 4. Décode le reste des données via le codec :
     Data: codec.Handler.decode(buffer),
   }
 }</code></pre>
           </section>
           <section>
-            <h4>Listes des messages</h4>
+            <h4>Me liste des messages !</h4>
             <pre><code class="hljs go">codec.CreateBinaryEncoder([]codec.RegisteredCodec{
   {0, "me:id", codec.Int8Codec{}},
   {1, "me:name", codec.StringCodec{}},
@@ -270,8 +297,12 @@ type RegisteredCodec struct {
   {6, "client:position", codec.CreatePositionCodec()},
 })</code></pre>
           </section>
+        </section>
+        <section>
+          <section data-background-image="img/gopher-play.png" data-background-size="contain" data-background-color="rgb(26, 33, 50)">
+          </section>
           <section>
-            <h4>Gorilla Websocket</h4>
+            <h4>go get gorilla/websocket</h4>
             <pre><code class="hljs go">func (s *Server) Handler(w http.ResponseWriter, r *http.Request) {
   socket, err := server.upgrader.Upgrade(w, r, nil)
   client := s.createClient(socket)
@@ -281,51 +312,59 @@ type RegisteredCodec struct {
 http.HandleFunc("/ws", server.Handler)</code></pre>
           </section>
           <section>
-            <h4>Envoi</h4>
-            <pre><code class="hljs go">func (c *Client) write(data []byte) {
-  c.socket.WriteMessage(websocket.BinaryMessage, data)
-}</code></pre>
-          </section>
-          <section>
-            <h4>Reception</h4>
-            <pre><code class="hljs go">func (c *Client) run(server *Server) {
+            <pre><code class="hljs go">// Récéption des messages du client
+func (c *Client) run(server *Server) {
   for {
-     // (type int, p []byte, err error)
-    _, data, err := c.socket.ReadMessage()
+    // (type int, p []byte, err error)
+    _, data, err := c.Socket.ReadMessage()
+
+    // Gère une éventuelle erreur
     if err != nil {  /* Close socket */ }
 
-    server.in &lt;- ClientMessage{c, c.encoder.Decode(data)}
+    // Publie une message cleint dans le channel
+    server.in &lt;- ClientMessage{
+      client: c,
+      // Décode la donnée via le BinaryEncoder
+      message: c.encoder.Decode(data)
+    }
   }
 }</code></pre>
           </section>
           <section>
-            <h4>Server goroutine</h4>
-            <pre><code class="hljs go">func (server *Server) Run() {
+            <pre><code class="hljs go">// Goroutine du channel
+func (s *Server) Run() {
   for {
-    m := <-server.in
-    switch m.message.Name {
-    case "me:position":
-      m.client.setPosition(m.message.Data.(codec.Position))
-      // Send position to other clients
-    }
-    case "me:name":
-      m.client.setName(m.message.Data.(string))
-      // Send name to other clients
-    }
+    cm := &lt;-s.in
+    s.HandleClientMessage(cm.client, cm.message)
   }
+}</code></pre>
+          </section>
+          <section>
+            <pre><code class="hljs go">// Traitement des messages client
+func (s *Server) HandleClientMessage(c *Client, m codec.Message) {
+  switch m.Name {
+  case "me:position":
+    // Met à jour la position du client :
+    c.setPosition(m.Data.(codec.Position))
+    // Envoie la nouvelle position à tous les clients :
+    s.writeAll(codec.Message{
+      Name: "client:position",
+      Data: codec.ClientPosition{c.id, c.x, c.y},
+    })
+  }
+  case "me:name":
+    // [Mise à jour et envoi du nom ...]
 }</code></pre>
           </section>
           <section>
             <h4>Broadcast</h4>
-            <pre><code class="hljs golang">server.writeAll(codec.Message{
-  "client:position",
-  codec.ClientPosition{c.id, c.x, c.y},
-})
-
-func (server Server) writeAll(message codec.Message) {
+            <pre><code class="hljs golang">func (server Server) writeAll(message codec.Message) {
+  // Encode le message en binaire :
   bytes := server.encoder.Encode(message)
+
   for _, c := range server.clients {
-    c.write(bytes)
+    // Envoi les octets à chaque client :
+    c.Socket.write(bytes)
   }
 }</code></pre>
           </section>
