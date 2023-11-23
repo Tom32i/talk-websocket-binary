@@ -21,3 +21,14 @@ pre.code-wrapper code {
     margin-right: 0;
     right: 0;
 }
+
+.hljs-string { color: #a9dc76; }
+.hljs-number { color: #ff6188; }
+.color-x { color: #78dce8; }
+.color-y { color: #ab9df2; }
+
+.gopher {
+    position: fixed;
+    bottom: -50%;
+    right: 0;
+}

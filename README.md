@@ -5,7 +5,7 @@
 > On s'amusera à les voir prendre vie tous ensemble dans une demo live ... en GO !
 
 
-Slides: https://tom32i.github.io/netcode-binary
+Slides: https://tom32i.github.io/talk-websocket-binary
 
 ## Setup
 

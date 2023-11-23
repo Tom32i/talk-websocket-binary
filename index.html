@@ -13,7 +13,7 @@
         </section>
         <section>
           <section data-background-size="contain">
-            <h4>Qu'est-ce que les Websocket ?</h4>
+            <h4>Qu'est-ce que les Websocket ? 🧦</h4>
             <!-- <img class="r-stretch" src="img/sockette.webp"> -->
           </section>
           <section>
@@ -23,12 +23,12 @@
           </section>
           <section>
             <h4>Connexion persistante et bidirectionelle</h4>
-            <img class="r-stretch" src="img/websocket.svg" />
+            <img class="r-stretch plain" src="img/websocket.svg" />
           </section>
           <section>
             <h4>Le protocol</h4>
             <!-- Connexion bidirectionnelle persistante entre un serveur web et un navigateur sur un socket TCP -->
-            <img class="r-stretch" src="img/handshake.svg">
+            <img class="r-stretch plain" src="img/handshake.svg">
           </section>
           <section>
             <h4>Handshake 🤝</h4>
@@ -40,7 +40,7 @@
             <img src="img/json.png" />
           </section>
           <section>
-            <h4>C'est cool ! Ça va vite !</h4>
+            <h4>C'est cool ! Ça va vite ! ⚡️</h4>
             <h4 class="fragment">Mais peut-on faire mieux ?</h4>
           </section>
         </section>
@@ -50,11 +50,12 @@
             <!-- JSON est en binaire en vrai, mais pas optimisé -->
           </section>
           <section>
-            <pre><code class="hljs json" id="json1">{ "name": "client", "id": 42 }</code></pre>
+            <h5>Message JSON</h5>
+            <pre><code class="hljs txt" id="json1">{ "name": "client:new", "id": 42 }</code></pre>
             <pre class="fragment"><code class="hljs txt code-inline">[123 32 34 110 97 109 101 34 58 32 34 99 108 105 101 110 116 34 44 32 34 105 100 34 58 32 52 50 32 125]</code></pre>
             <div class="fragment">
               <pre><code class="hljs txt code-inline">01111011 00100000 00100010 01101110 01100001 01101101 01100101 00100010 00111010 00100000 00100010 01100011 01101100 01101001 01100101 01101110 01110100 00100010 00101100 00100000 00100010 01101001 01100100 00100010 00111010 00100000 00110100 00110010 00100000 01111101</code></pre>
-              <p class="caption fragment">30 charactères / 30 octets</p>
+              <p class="caption fragment">34 charactères / 34 octets</p>
             </div>
           </section>
           <section>
@@ -66,18 +67,19 @@
           </section>
           <section>
             <h5>Mon information</h5>
-            <pre class=""><code class="hljs json">{ "name": "client", "id": 42 }</code></pre>
-            <pre class="fragment"><code class="">[client, 42]</code></pre>
-            <pre class="fragment"><code class="">[message, clientId]</code></pre>
+            <pre class=""><code class="hljs json">{ "name": "client:new", "id": 42 }</code></pre>
+            <pre class="fragment"><div class="code hljs txt">[<span class="hljs-string">client:new</span>, <span class="hljs-number">42</span>]</div></pre>
+            <pre class="fragment"><div class="code hljs txt">[<span class="hljs-string">messageName</span>, <span class="hljs-number">clientId</span>]</div></pre>
           </section>
           <section>
             <img class="r-stretch" src="img/morse.jpeg">
           </section>
           <section>
+            <h3>Messages</h3>
             <table>
               <thead>
                 <tr>
-                  <th>Message</th>
+                  <th>Name</th>
                   <th>Id</th>
                 </tr>
               </thead>
@@ -105,14 +107,14 @@
             </table>
           </section>
           <section>
-            <pre><code>[client:new, clientId]</code></pre>
-            <pre><code>[1, 42]</code></pre>
-            <pre><code>00000001 00101010</code></pre>
+            <pre><div class="code hljs txt">[<span class="hljs-string">client:new</span>, <span class="hljs-number">clientId</span>]</div></pre>
+            <pre><div class="code hljs txt">[<span class="hljs-string">1</span>, <span class="hljs-number">42</span>]</div></pre>
+            <pre><div class="code hljs txt"><span class="hljs-string">00000001</span> <span class="hljs-number">00101010</span></div></pre>
             <p class="caption">2 octets</p>
           </section>
           <section>
             <h4>Plus complexe ...</h4>
-            <pre><code class="hljs json">{
+            <pre><code class="hljs txt">{
   "name": "player:position",
   "id":   42,
   "x":    3466,
@@ -120,58 +122,41 @@
 }</code></pre>
           </section>
           <section>
-            <pre><code>[player:position, clientId, X, Y]</code></pre>
-            <pre><code>[5, 42, 3466, 6046]</code></pre>
+            <pre><div class="code hljs txt">[<span class="hljs-string">player:position</span>, <span class="hljs-number">clientId</span>, <span class="color-x">X</span>, <span class="color-y">Y</span>]</div></pre>
+            <pre class="fragment"><div class="code hljs txt">[<span class="hljs-string">5</span>, <span class="hljs-number">42</span>, <span class="color-x">3466</span>, <span class="color-y">6046</span>]</div></pre>
             <div class="fragment">
-              <pre><code>00000101 00101010 110110001010 1011110011110</code></pre>
+              <pre><div class="code hljs txt"><span class="hljs-string">00000101</span> <span class="hljs-number">00101010</span> <span class="color-x">00001101 10001010</span> <span class="color-y">00010111 10011110</span></div></pre>
               <p class="caption">6 octets</p>
             </div>
           </section>
-          <!-- <section>
-            <h4>Avec du texte</h4>
-            <pre><code class="hljs json">{
-  "name":  "player:name",
-  "id":    42,
-  "value": "Tom32i",
-}</code></pre>
-          </section> -->
-          <!-- <section>
-            <pre><code>[id, clientId, length, T, o, m, 3, 2, i]</code></pre>
-            <pre><code>[6, 42, 6, 84, 111, 109, 51, 50, 105]</code></pre>
-            <div class="fragment">
-              <pre><code>00000110 00101010 00000110 01010100 01101111 01101101 00110011 00110010 01101001</code></pre>
-              <p class="caption">9 octets</p>
-            </div>
-          </section> -->
-        </section>
-        <section>
           <section>
             <h4>La réception</h4>
-            <pre class="fragment"><code>00000111 00101010 00000001</code></pre>
+            <pre class="fragment"><code class="txt">00000111 00101010 00000001</code></pre>
           </section>
           <section>
             <h4>Decodage du premier octet</h4>
+            <pre><code class="txt">00000111</code></pre>
             <!-- Pour savoir à quel message j'ai affaire -->
-            <pre class="fragment"><code>00000111</code></pre>
-            <pre class="fragment"><code>7</code></pre>
-            <pre class="fragment"><code>player:kill</code></pre>
+            <pre class="fragment"><code class="txt">7</code></pre>
+            <pre class="fragment"><code class="txt">player:kill</code></pre>
           </section>
           <section>
             <h4>Decodage du reste du message</h4>
             <!-- Pour savoir à quel message j'ai affaire -->
-            <pre class="fragment"><code>[player:kill, killerID, killedID]</code></pre>
-            <pre class="fragment"><code>00000111 00101010 00000001</code></pre>
-            <pre class="fragment"><code>7, 42, 1</code></pre>
-            <pre class="fragment"><code>"Player 42 killed player 1"</code></pre>
+            <pre><div class="code hljs txt">[<span class="hljs-string">player:kill</span>, <span class="hljs-number">killerID</span>, <span class="color-x">killedID</span>]</div></pre>
+            <pre class="fragment"><div class="code hljs txt"><span class="hljs-string">00000111</span> <span class="hljs-number">00101010</span> <span class="color-x">00000001</span></div></pre>
+            <pre class="fragment"><div class="code hljs txt">[<span class="hljs-string">7</span>, <span class="hljs-number">42</span>, <span class="color-x">1</span>]</div></pre>
+            <pre class="fragment"><div class="code hljs txt"><span class="hljs-string">"Player <span class="hljs-number">42</span> killed player <span class="color-x">1</span>"</span></div></pre>
           </section>
         </section>
         <section>
           <section>
             <h3>Codons un Miro ! 🎉</h3>
+            <img class="gopher fragment fade-up plain" src="img/gopher.svg" />
           </section>
           <section>
             <h4>Encoder/Decoder</h4>
-            <img class="r-stretch" src="img/codec.svg">
+            <img class="r-stretch plain" src="img/codec.svg">
           </section>
           <section>
             <pre><code class="hljs go">type Codec interface {
@@ -183,25 +168,25 @@
             <h4>Codec de base</h4>
             <pre><code class="hljs go">type Int8Codec struct {}
 
-func (c *Int8Codec) encode(buffer *bytes.Buffer, message any) {
-    buffer.Write([]byte{message.(uint8)})
+func (c *Int8Codec) encode(buf *bytes.Buffer, data any) {
+    buf.Write([]byte{data.(uint8)})
 }
 
-func (c *Int8Codec) decode(buffer *bytes.Buffer) any {
-    return buffer.Next(1)[0]
+func (c *Int8Codec) decode(buf *bytes.Buffer) any {
+    return buf.Next(1)[0]
 }</code></pre>
           </section>
           <section>
             <pre><code class="hljs go">type Int16Codec struct {}
 
-func (c *Int16Codec) encode(buffer *bytes.Buffer, message any) {
+func (c *Int16Codec) encode(buf *bytes.Buffer, data any) {
     b := make([]byte, 2)
-    binary.BigEndian.PutUint16(b[0:], message.(uint16))
-    buffer.Write(b)
+    binary.BigEndian.PutUint16(b[0:], data.(uint16))
+    buf.Write(b)
 }
 
-func (c *Int16Codec) decode(buffer *bytes.Buffer) any {
-    return binary.BigEndian.Uint16(buffer.Next(2)[0:])
+func (c *Int16Codec) decode(buf *bytes.Buffer) any {
+    return binary.BigEndian.Uint16(buf.Next(2)[0:])
 }</code></pre>
           </section>
           <section>
@@ -234,7 +219,7 @@ func (c *PositionCodec) decode(buffer *bytes.Buffer) any {
 }</code></pre>
           </section>
           <section>
-            <img class="r-stretch" src="img/encoder.svg">
+            <img class="r-stretch plain" src="img/encoder.svg">
           </section>
           <section>
             <pre><code class="hljs go">type BinaryEncoder struct {
@@ -296,7 +281,7 @@ type RegisteredCodec struct {
 http.HandleFunc("/ws", server.Handler)</code></pre>
           </section>
           <section>
-            <h4>Ecriture</h4>
+            <h4>Envoi</h4>
             <pre><code class="hljs go">func (c *Client) write(data []byte) {
   c.socket.WriteMessage(websocket.BinaryMessage, data)
 }</code></pre>
@@ -310,6 +295,37 @@ http.HandleFunc("/ws", server.Handler)</code></pre>
     if err != nil {  /* Close socket */ }
 
     server.in &lt;- ClientMessage{c, c.encoder.Decode(data)}
+  }
+}</code></pre>
+          </section>
+          <section>
+            <h4>Server goroutine</h4>
+            <pre><code class="hljs go">func (server *Server) Run() {
+  for {
+    m := <-server.in
+    switch m.message.Name {
+    case "me:position":
+      m.client.setPosition(m.message.Data.(codec.Position))
+      // Send position to other clients
+    }
+    case "me:name":
+      m.client.setName(m.message.Data.(string))
+      // Send name to other clients
+    }
+  }
+}</code></pre>
+          </section>
+          <section>
+            <h4>Broadcast</h4>
+            <pre><code class="hljs golang">server.writeAll(codec.Message{
+  "client:position",
+  codec.ClientPosition{c.id, c.x, c.y},
+})
+
+func (server Server) writeAll(message codec.Message) {
+  bytes := server.encoder.Encode(message)
+  for _, c := range server.clients {
+    c.write(bytes)
   }
 }</code></pre>
           </section>
@@ -331,7 +347,7 @@ http.HandleFunc("/ws", server.Handler)</code></pre>
 ])</code></pre>
           </section>
           <section>
-            <h3>Demo time !</h3>
+            <h3>Demo time ! ✨</h3>
           </section>
           <section data-background-iframe="https://go.tom32i.fr?name=Tom32i" data-background-interactive=false>
             <h5 class="fragment fade-out">go.tom32i.fr</h5>
@@ -342,10 +358,28 @@ http.HandleFunc("/ws", server.Handler)</code></pre>
             <div class="sources">
               <h3>Ressources</h3>
               <p>🐙 <a target="_blank" href="https://github.com/Tom32i/go-websocket">Tom32i/go-websocket</a></p>
-              <p>🐙 <a target="_blank" href="https://github.com/Tom32i/netcode-binary">Tom32i/netcode-binary</a></p>
+              <p>🐙 <a target="_blank" href="https://github.com/Tom32i/talk-websocket-binary">Tom32i/talk-websocket-binary</a></p>
             </div>
             <h1 class="fragment thanks">Merci !🙏</h1>
           </div>
+        </section>
+        <section>
+          <section>
+            <h4>Avec du texte</h4>
+            <pre><code class="hljs txt">{
+  "name":  "player:name",
+  "id":    42,
+  "value": "Tom32i",
+}</code></pre>
+          </section>
+          <section>
+            <pre><code class="txt">[id, clientId, length, T, o, m, 3, 2, i]</code></pre>
+            <pre><code class="txt">[6, 42, 6, 84, 111, 109, 51, 50, 105]</code></pre>
+            <div class="fragment">
+              <pre><code class="txt code-inline">00000110 00101010 00000110 01010100 01101111 01101101 00110011 00110010 01101001</code></pre>
+              <p class="caption">9 octets</p>
+            </div>
+          </section>
         </section>
       </div>
     </div>
